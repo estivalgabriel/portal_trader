@@ -1,0 +1,65 @@
+<?php
+	verificaPermissaoPagina(2);
+
+	if(isset($_GET['excluir'])){
+		$idExcluir = intval($_GET['excluir']);
+		Painel::deletar('tb_admin.faturas',$idExcluir);
+		Painel::redirect(INCLUDE_PATH_PAINEL.'listar-faturas');
+	}else if(isset($_GET['id'])){
+		Painel::orderItem('tb_admin.faturas;',$_GET['id']);
+	}
+
+	$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+	$porPagina = 25;
+
+	$faturas = Painel::selectAll('tb_admin.faturas',($paginaAtual - 1) * $porPagina,$porPagina);
+
+?>
+<div class="box-content">
+	<h2><i class="fa fa-id-card-o" aria-hidden="true"></i> Listar Faturas</h2>
+	<div class="wraper-table">
+	<table>
+		<tr>
+			<td>ID</td>
+			<td>Nome do Trader</td>
+			<td>Data Emissão</td>
+			<td>Vencimento</td>
+			<td>Valor</td>
+			<td>Status</td>
+			<td>#</td>
+			<td>#</td>
+		</tr>
+
+		<?php
+			foreach ($faturas as $key => $value) {
+		?>
+		<tr>
+			<td><?php echo $value['id']; ?></td>
+			<td><?php echo $value['trader']; ?></td>
+			<td><?php echo $value['data']; ?></td>
+			<td><?php echo $value['vencimento']; ?></td>
+			<td>R$<?php echo $value['valor']; ?></td>
+			<td><?php echo $value['status']; ?></td>
+			<td><a class="btn edit" href="<?php echo INCLUDE_PATH_PAINEL ?>editar-fatura?id=<?php echo $value['id']; ?>"><i class="fa fa-pencil"></i> Editar</a></td>
+			<td><a actionBtn="delete" class="btn delete" href="<?php echo INCLUDE_PATH_PAINEL ?>listar-faturas?excluir=<?php echo $value['id']; ?>"><i class="fa fa-times"></i> Excluir</a></td>
+		</tr>
+
+		<?php } ?>
+
+	</table>
+	</div>
+
+	<div class="paginacao">
+		<?php
+			$totalPaginas = ceil(count(Painel::selectAll('tb_admin.faturas')) / $porPagina);
+
+			for($i = 1; $i <= $totalPaginas; $i++){
+				if($i == $paginaAtual)
+					echo '<a class="page-selected" href="'.INCLUDE_PATH_PAINEL.'listar-faturas?pagina='.$i.'">'.$i.'</a>';
+				else
+					echo '<a href="'.INCLUDE_PATH_PAINEL.'listar-faturas?pagina='.$i.'">'.$i.'</a>';
+			}
+
+		?>
+	</div><!--paginacao-->
+</div><!--box-content-->
